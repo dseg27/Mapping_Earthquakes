@@ -23,7 +23,7 @@ let baseMaps = {
 let map = L.map("mapid",{
   center: [44.0, -80.0],
   zoom: 2,
-  layers: [light]
+  layers: [dark]
 });
 
 // Pass map layers to layer control, add to map 
@@ -34,5 +34,9 @@ let torontoData = "https://raw.githubusercontent.com/dseg27/Mapping_Earthquakes/
 // Grab data 
 d3.json(torontoData).then(function(data) {
   console.log(data);
-  L.geoJSON(data).addTo(map);
+  L.geoJSON(data, function(feature, layer){
+    console.log(layer);
+    layer.bindPopup("<h2>"+"Airport Code: " +feature.properties.faa +  "</h2> <hr> <h3> Airport Name: " + feature.properties.name+ "</h3>");
+  })
+
 });
