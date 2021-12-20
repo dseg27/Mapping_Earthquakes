@@ -29,10 +29,49 @@ let map = L.map("mapid",{
 // Pass map layers to layer control, add to map 
 L.control.layers(baseMaps).addTo(map);
 
+// Style marker 
+function styleInfo(feature){
+    return{
+        opacity: 1,
+        fillOpacity: 1,
+        fillColor: "#ffae42",
+        color: "#000000",
+        radius: getRadius(),
+        stroke: true,
+        weight: 0.5
+    }
+}
+
+// Styling functions 
+function styleInfo(feature) {
+    return {
+        opacity: 1,
+        fillOpacity: 1,
+        fillColor: "orange",
+        color: "#000000",
+        radius: getRadius(),
+        stroke: true,
+        weight: 0.5
+    };
+    }
+
+// Get radius 
+function getRadius(magnitude) {
+    if (magnitude === 0) {
+        return 1;
+    }
+    return magnitude * 4;
+}
 
 // Retrieve the earthquake GeoJSON data.
 d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson")
 .then(function(data) {
-  // Creating a GeoJSON layer with the retrieved data.
-  L.geoJSON(data).addTo(map);
+    // Creating a GeoJSON layer with the retrieved data.
+    L.geoJSON(data, {
+        pointToLayer: function(feature, latlng){
+            console.log(data);
+            return L.circleMarker(latlng)
+            },
+        style: styleInfo
+    }).addTo(map);
 });
