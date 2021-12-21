@@ -113,23 +113,21 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
     earthquakes.addTo(map);
 });
 
-// Legend control 
-let legend = L.control({
-    position: "bottomright"
-});
+// Create a legend control object 
+var legend = L.control({position: 'bottomright'});
 
 legend.onAdd = function () {
-    let div = L.DomUtil.create("div", "info legend");
 
-    const magnitudes = [0, 1, 2, 3, 4, 5];
-    const colors = [
-        "#98ee00",
-        "#d4ee00",
-        "#eecc00",
-        "#ee9c00",
-        "#ea822c",
-        "#ea2c2c"
-    ];
+    let div = L.DomUtil.create("div", "info legend");
+        const magnitudes = [0, 1, 2, 3, 4, 5];
+        const colors = [
+            "#98ee00",
+            "#d4ee00",
+            "#eecc00",
+            "#ee9c00",
+            "#ea822c",
+            "#ea2c2c"
+        ];
 
     // Looping through our intervals to generate a label with a colored square for each interval.
     for (var i = 0; i < magnitudes.length; i++) {
@@ -139,6 +137,42 @@ legend.onAdd = function () {
         magnitudes[i] + (magnitudes[i + 1] ? "&ndash;" + magnitudes[i + 1] + "<br>" : "+");
     }
     return div;
-    };
+};
 
-    legend.addTo(map);
+legend.addTo(map);
+
+
+
+
+
+
+
+// // Legend control 
+// let legend = L.control({
+//     position: "bottomright"
+// });
+
+// legend.onAdd = function () {
+//     let div = L.DomUtil.create("div", "info legend");
+
+//     const magnitudes = [0, 1, 2, 3, 4, 5];
+//     const colors = [
+//         "#98ee00",
+//         "#d4ee00",
+//         "#eecc00",
+//         "#ee9c00",
+//         "#ea822c",
+//         "#ea2c2c"
+//     ];
+
+//     // Looping through our intervals to generate a label with a colored square for each interval.
+//     for (var i = 0; i < magnitudes.length; i++) {
+//         console.log(colors[i]);
+//         div.innerHTML +=
+//         "<i style='background: " + colors[i] + "'></i> " +
+//         magnitudes[i] + (magnitudes[i + 1] ? "&ndash;" + magnitudes[i + 1] + "<br>" : "+");
+//     }
+//     return div;
+//     };
+
+//     legend.addTo(map);
