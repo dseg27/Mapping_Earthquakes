@@ -15,6 +15,13 @@ let satelliteStreets = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/sate
 	accessToken: API_KEY
 });
 
+// Deliverable 3 -> add 3rd tile layer
+let newLayer = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+	attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery (c) <a href="https://www.mapbox.com/">Mapbox</a>',
+	maxZoom: 18,
+	accessToken: API_KEY
+});
+
 // Create the map object with center, zoom level and default layer.
 let map = L.map('mapid', {
 	center: [40.7, -94.5],
@@ -25,17 +32,20 @@ let map = L.map('mapid', {
 // Create a base layer that holds all three maps.
 let baseMaps = {
   "Streets": streets,
-  "Satellite": satelliteStreets
+  "Satellite": satelliteStreets,
+  "Dark View": newLayer
 };
 
 // 1. Add a 2nd layer group for the tectonic plate data.
 let allEarthquakes = new L.LayerGroup();
 let tectonicPlates = new L.LayerGroup();
+let majorData = new L.LayerGroup(); 
 
 // 2. Add a reference to the tectonic plates group to the overlays object.
 let overlays = {
   "Earthquakes": allEarthquakes,
-  " Tectonic Plates": tectonicPlates
+  "Tectonic Plates": tectonicPlates,
+  "Major Earthquakes": majorData
 };
 
 // Then we add a control to the map that will allow the user to change which
@@ -70,22 +80,15 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
   }
   // This function determines the color of the marker based on the magnitude of the earthquake.
   function getColor(magnitude) {
-    if (magnitude > 5) {
+    if (magnitude > 6) {
       return "#ea2c2c";
     }
-    if (magnitude > 4) {
+    if (magnitude > 5) {
       return "#ea822c";
     }
-    if (magnitude > 3) {
-      return "#ee9c00";
-    }
-    if (magnitude > 2) {
-      return "#eecc00";
-    }
-    if (magnitude > 1) {
+    if (magnitude <= 5){
       return "#d4ee00";
     }
-    return "#98ee00";
   }
 
   // This function determines the radius of the earthquake marker based on its magnitude.
@@ -116,13 +119,14 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
   // Then we add the earthquake layer to our map.
   allEarthquakes.addTo(map);
 
-  // Here we create a legend control object.
-let legend = L.control({
-  position: "bottomright"
-});
 
-// Then add all the details for the legend
-legend.onAdd = function() {
+  // Here we create a legend control object.
+ let legend = L.control({
+  position: "bottomright"
+ });
+
+ // Then add all the details for the legend
+ legend.onAdd = function() {
   let div = L.DomUtil.create("div", "info legend");
 
   const magnitudes = [0, 1, 2, 3, 4, 5];
@@ -135,7 +139,7 @@ legend.onAdd = function() {
     "#ea2c2c"
   ];
 
-// Looping through our intervals to generate a label with a colored square for each interval.
+ // Looping through our intervals to generate a label with a colored square for each interval.
   for (var i = 0; i < magnitudes.length; i++) {
     console.log(colors[i]);
     div.innerHTML +=
@@ -157,4 +161,18 @@ legend.onAdd = function() {
   });
   tectonicPlates.addTo(map);
 
+  // Use d3.json() to get major earthquake data 
+  d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson").then(function(data){
+    L.geoJson(data, {
+      pointToLayer: function(feature, latlng) {
+        console.log(data);
+        return L.circleMarker(latlng);
+      },
+      style: styleInfo,
+      onEachFeature: function(feature, layer) {
+        layer.bindPopup("Magnitude: " + feature.properties.mag + "<br>Location: " + feature.properties.place);
+      }
+    }).addTo(majorData);
+  });
+  majorData.addTo(map); 
 });
